@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil - {{ app.user.lastName }} {{ app.user.firstName }}{% endblock %}
+
+
+
+{% block body %}
+    <div class="container-fluid">
+
+        <!-- head of page: student main info-->
+        <div class="row">
+            <div class="col-2">
+                {% if are_not_unknow %}
+                    {% if is_friend %}
+                        <span class="float-right btn btn-success">Vous êtes amis</span>
+                    {% elseif waiting_for_accept %}
+                        <span class="float-right btn btn-info">En attente..</span>
+                    {% endif %}
+                {% else %}
+
+                    <button class="float-right btn btn-primary" id="addFriendBtn"><a
+                                href="{{ path('add_friend', {'uuid_student': student.uuid}) }}" id="hrefFriendBtn">Ajouter
+                            en ami</a></button>
+                {% endif %}
+            </div>
+            <div class="col-8 align-self-center">
+                <div class="text-center">
+                    {% if student.avatar %}
+                        <img class="profile-avatar" src={{ asset('uploads/avatars/' ~ student.avatar) }}>
+                    {% else %}
+                        <img class="profile-avatar" src="{{ asset('img/imageBaseProfil.png') }}">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-2"></div>
+        </div>
+
+        <div class="row">
+            <div class="col align-self-center">
+                <div class="text-center">
+                    <span class="font-weight-bold h4">{{ student.Lastname }}  </span>
+                    <span class="h4"> {{ student.firstName }} </span>
+                    {% if student.trainingid is not null %}
+                        <div> {{ student.trainingid.title }} | {{ student.trainingid.schoolid.name }}
+                            | {{ app.user.trainingid.schoolid.city }}</div>
+                    {% else %}
+                        <div> n/a | n/a | n/a</div>
+                    {% endif %}
+                    <p class="font-weight-light">{{ student.biography }} </p>
+                    <!-- système de like du profil-->
+                    {% if student in app.user.getStudentid %}
+
+                        <a href="{{ path('unlikeProfile', {'uuid_student': student.uuid}) }}">
+                            <span class="btn btn-primary"><i
+                                        class="fas fa-thumbs-down pr-1"></i> Ne plus recommander </span>
+                        </a>
+
+
+                    {% else %}
+                        <a href="{{ path('likeProfile', {'uuid_student': student.uuid}) }}">
+                            <span class="btn btn-primary"><i class="fas fa-thumbs-up pr-2"></i>Recommander </span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col align-self-baseline">
+            {% if  student.gradeid  is not null %}
+                <h3>   {{ student.gradeid.name }} - Niveau {{ (student.xpWon / 50)|slice(0,1) }}</h3>
+            {% else %}
+                <h3>Recrue - Niveau {{ (student.xpWon / 50)|slice(0,1) }}</h3>
+            {% endif %}
+
+            <div class="progress mt-3">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                     aria-valuenow="60" aria-valuemin="0"
+                     aria-valuemax="100"
+                     style="width:{{ ((student.xpWon)/50)|number_format(2, '.', ',')|slice(2,4) }}%; background-color: #6d7fcc">
+                </div>
+            </div>
+            <span class="text-center"> Vous avez {{ ((student.xpWon)/50)|number_format(2, '.', ',')|slice(2,4)/2 }} / 50 pour passer le niveau suivant</span>
+
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col align-self-baseline">
+            <h3>Badges</h3>
+            {% for i in student.getBadgeid() %}
+                <img src={{ asset("img/tr.png") }} height="50px"> &nbsp;
+                {{ i.getName() }}
+                <br/> <br/>
+            {% endfor %}
+        </div>
+    </div>
+
+    <hr>
+    <div class="row">
+
+        <div class="col align-self-baseline">
+            <h3>Compétences</h3>
+        </div>
+    </div>
+
+
+
+
+    <div class="row">
+        <div class="col align-self-baseline">
+            {% for i in noteUser %}
+                <p class="font-weight-bolder">   {{ i.getSubjectid().getName() }} : <br/>
+                    {% for j in 1..i.mark %}
+                        <span class="fa fa-star" style="color:orange"></span>
+                    {% endfor %}
+                </p>
+            {% endfor %}
+        </div>
+    </div>
+
+
+{% endblock %}
+    {% block javascripts %}
+        <script>
+            $(document).ready(function () {
+                var compteur = 0;
+                $("#hrefFriendBtn").click(function (e) {
+                    if (compteur > 0) {
+                        e.preventDefault();
+                    } else {
+                        $('#hrefFriendBtn').attr("disabled", true);
+                        $("#addFriendBtn").attr("disabled", true);
+                    }
+                    compteur++;
+                })
+            });
+        </script>
+    {% endblock %}

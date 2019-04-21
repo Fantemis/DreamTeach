@@ -1,0 +1,16 @@
+#card
+{
+    margin-top: 10%;
+}
+
+.button-navbar
+{
+    margin-right: 5px;
+}
+
+.profile-avatar{
+    width: 150px;
+    height: 150px;
+    border-radius: 150px;
+}
+

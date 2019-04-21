@@ -1,0 +1,32 @@
+{% extends "base.html.twig" %}
+
+{% block title %}DreamTeach{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="display-4 text-center">Memory</h1>
+    </div>
+    <div id="bip" class="display">Timer : </div>
+    {% set compteur = 0 %}
+    <div id="container">
+            <div id="memory">
+                {% for word in words %}
+                    <div class="row mb-2">
+                        {% set compteur = compteur + 1%}
+                            <div class="col-6">
+                                <button class="btn btn-block " value="{{ word.getWord }}"id="{{ word.getId }}" style="background-color:#6d7fcc; color:white;">Card </button>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-block" value="{{ wordsDefinition[compteur - 1].getDefinition }}" id="{{ wordsDefinition[compteur - 1].getId }}" style="background-color:#6d7fcc; color:white;">Card</button>
+                            </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    <a href="{{ path('memory') }}" class="btn btn-block mt-5" style="background-color: #6d7fcc;color: white;">Relancer</a>
+
+    </div>
+
+
+    <script src="{{ asset('js/memory.js') }}"></script>
+{% endblock %}

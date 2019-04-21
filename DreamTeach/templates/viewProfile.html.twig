@@ -1,0 +1,178 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil - {{ app.user.lastName }} {{ app.user.firstName }}{% endblock %}
+
+
+
+{% block body %}
+    <div class="container-fluid" >
+
+        <!-- head of page: student main info-->
+        <div class="row">
+            <div class="col align-self-center">
+                <div class="text-center">
+
+
+                    {% if app.user.avatar %}
+
+                        <img class="profile-avatar" src={{ asset('uploads/avatars/' ~ app.user.avatar) }}>
+
+                    {% else %}
+                        <img class="profile-avatar" src="{{ asset('img/imageBaseProfil.png') }}"
+                        >
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col align-self-center">
+                <div class="text-center">
+                    </br>
+                    <span class="font-weight-bold h4">{{ app.user.Lastname }} </span>
+                    <span class="h4"> {{ app.user.firstName }} </span>
+                    {% if  app.user.trainingid is not null %}
+                        <div> {{ app.user.trainingid.title }} | {{ app.user.trainingid.schoolid.name }}
+                            | {{ app.user.trainingid.schoolid.city }}</div>
+                    {% else %}
+                        <div> n/a | n/a | n/a</div>
+                    {% endif %}
+                    <p class="font-weight-light">  {{ app.user.biography }} </p>
+
+                    <form action="{{ path('student_profile') }}" method="POST">
+                        <button class="btn btn-warning" name="editer" type="submit">Modifier <i class="far fa-edit"></i>
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end head of page-->
+
+    <hr>
+    <div class="row">
+        <div class="col align-self-baseline">
+            {% if  app.user.gradeid  is not null %}
+                <h3>   {{ app.user.gradeid.name }} - Niveau {{ (app.user.xpWon / 50)|slice(0,1) }}</h3>
+            {% else %}
+                <h3>Recrue - Niveau {{ (app.user.xpWon / 50)|slice(0,1) }}</h3>
+            {% endif %}
+
+            <div class="progress mt-3">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                     aria-valuenow="60" aria-valuemin="0"
+                     aria-valuemax="100"
+                     style="width:{{ ((app.user.xpWon)/50)|number_format(2, '.', ',')|slice(2,4) }}%; background-color: #6d7fcc">
+                </div>
+            </div>
+            <span class="text-center"> Vous avez {{ ((app.user.xpWon)/50)|number_format(2, '.', ',')|slice(2,4)/2 }} / 50 pour passer le niveau suivant</span>
+
+        </div>
+
+    </div>
+    <hr>
+
+    <div class="row">
+        <div class="col align-self-baseline">
+            <h3>Badges</h3>
+            {% for i in app.user.getBadgeid() %}
+                <img src={{ asset("img/tr.png") }} height="50px"> &nbsp;
+                {{ i.getName() }}
+                <br/> <br/>
+            {% endfor %}
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- display self notation -->
+    <div class="row">
+
+        <div class="col align-self-baseline">
+            <h3>Compétences</h3>
+        </div>
+        <div class="col-2">
+            <button type="button" class="btn btn-warning" data-toggle="modal"
+                    data-target=".bd-example-modal-lg"><i class="far fa-edit"></i>
+            </button>
+        </div>
+    </div>
+
+
+
+
+    <div class="row">
+        <div class="col align-self-baseline">
+            {% for a in subjectlevel %}
+                <p class="font-weight-bolder">{{ a.subjectid.name }} <a href="{{ path('delete_subject_level', {'id': a.subjectlvlid}) }}"><span class="fas fa-times-circle text-danger"></span></a><br/>
+                {% for i in 1..a.mark %}
+                    <span class="fa fa-star" style="color:orange"></span>
+                {% endfor %}
+                </p>
+            {% endfor %}
+
+        </div>
+    </div>
+    <!-- end self notation -->
+
+
+
+
+    <!-- Large modal -->
+
+
+    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modifier vos compétences</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    {% if subjectList|length > 0 %}
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-1">
+                                </div>
+                                <div class="col-10 border border-secondary p-4 bg-light rounded mt-5">
+                                    <div class="mb-4 h4">Modifier une note</div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-1">
+                                </div>
+                                <div class="col-10 border border-secondary p-4 bg-light rounded mt-5">
+                                    <div class="h4 mb-4">Ajouter une note</div>
+                                    <div class="row mb-4">
+                                        <div class="col-8">
+                                            {{ form_start(form) }}
+                                            {{ form_widget((form.subjectid)) }}
+                                            {{ form_widget(form.mark) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit" class="btn btn-light"
+                                   style="background-color:#6d7fcc;color:white;" value="Valider">
+                            {{ form_end(form) }}
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+                        </div>
+                    {% else %}
+                        <h6>Vous avez deja renseigné toutes les matières disponibles</h6>
+                    {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+
+
+{% endblock %}
